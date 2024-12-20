@@ -7,13 +7,8 @@ const Footer: React.FC = () => {
         </div>
         <ul className="flex space-x-4 text-sm">
           <li>
-            <a href="/privacy-policy" className="hover:text-gray-400">
-              Privacy Policy
-            </a>
-          </li>
-          <li>
             <a href="/terms-of-service" className="hover:text-gray-400">
-              Terms of Service
+              Made By Vite + React
             </a>
           </li>
           <li>
