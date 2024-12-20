@@ -2,8 +2,9 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { tmdbApi } from "../../../api/apiConfig";
 import Card from "./card";
-import { setMovies } from "../../../redux/moviesSlice"; // Import setMovies dari moviesSlice
-import { RootState } from "../../../redux/store"; // RootState untuk selector
+import { setMovies } from "../../../redux/moviesSlice";
+import { RootState } from "../../../redux/store";
+import SkeletonCard from "../../skeleton";
 
 export interface Movie {
   id: number;
@@ -35,6 +36,7 @@ const MovieList: FunctionComponent = () => {
     }
   };
 
+  // Fetch Movies
   const fetchMovies = async () => {
     setLoading(true);
     try {
@@ -53,16 +55,22 @@ const MovieList: FunctionComponent = () => {
         : await tmdbApi.get("/discover/movie", { params });
 
       if (response.data.results.length === 0) {
-        setHasMore(false); // Tidak ada data tambahan
+        setHasMore(false);
       } else {
-        // Gabungkan movies lama dan baru, lalu hapus duplikat
-        const combinedMovies = [...movies, ...response.data.results];
-        const uniqueMovies = combinedMovies.filter(
-          (movie, index, self) =>
-            index === self.findIndex((m) => m.id === movie.id) // Filter ID unik
+        // Reset data jika ini halaman pertama, gabungkan jika Load More
+        const newMovies =
+          page === 1
+            ? response.data.results
+            : [...movies, ...response.data.results];
+
+        // Hapus duplikat berdasarkan ID
+        const uniqueMovies = newMovies.filter(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (movie: { id: any }, index: any, self: any[]) =>
+            index === self.findIndex((m) => m.id === movie.id)
         );
 
-        dispatch(setMovies(uniqueMovies)); // Simpan data unik ke Redux
+        dispatch(setMovies(uniqueMovies));
       }
     } catch (error) {
       console.error("Error fetching movies:", error);
@@ -71,15 +79,21 @@ const MovieList: FunctionComponent = () => {
     }
   };
 
-  // UseEffect for Genres and Movies Fetching
+  // Reset movies & page saat filter berubah
+  useEffect(() => {
+    dispatch(setMovies([])); // Reset Redux state movies
+    setPage(1); // Kembali ke halaman pertama
+  }, [selectedGenres, sortBy, searchQuery, dispatch]);
+
+  // Fetch genres on mount
   useEffect(() => {
     fetchGenres();
   }, []);
 
+  // Fetch movies setiap kali filter atau page berubah
   useEffect(() => {
     fetchMovies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedGenres, sortBy, searchQuery, page]);
+  }, [page, selectedGenres, sortBy, searchQuery]);
 
   // Handle Genre Checkbox Change
   const handleGenreChange = (id: number) => {
@@ -90,6 +104,7 @@ const MovieList: FunctionComponent = () => {
     );
   };
 
+  // Load More Handler
   const loadMoreMovies = () => {
     if (hasMore) {
       setPage((prevPage) => prevPage + 1);
@@ -99,8 +114,8 @@ const MovieList: FunctionComponent = () => {
   return (
     <div className="mt-16 p-4 bg-gray-900 text-white">
       {/* Title */}
-      <div className="sticky top-0 z-10 bg-gray-900 p-4 mb-4 shadow-md">
-        <h1 className="text-3xl font-bold border-b-4 border-red-500 inline-block">
+      <div className="sticky top-0 z-10 bg-gray-900 p-4 mb-4 shadow-md text-left">
+        <h1 className="text-3xl font-bold border-t-4 border-red-500 inline-block">
           Movies
         </h1>
       </div>
@@ -138,11 +153,14 @@ const MovieList: FunctionComponent = () => {
             ))}
           </div>
         </div>
+
         {/* Right Side for Movie Grid */}
         <div className="w-3/4">
           {/* Movies Grid */}
-          {loading ? (
-            <p className="text-center">Loading movies...</p>
+          {loading && page === 1 ? (
+            Array.from({ length: 8 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {movies?.map((movie: Movie) => (
