@@ -5,7 +5,7 @@ import Card from "./card";
 import { setMovies } from "../../../redux/moviesSlice"; // Import setMovies dari moviesSlice
 import { RootState } from "../../../redux/store"; // RootState untuk selector
 
-interface Movie {
+export interface Movie {
   id: number;
   title: string;
   release_date: string;
