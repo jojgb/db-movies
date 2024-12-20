@@ -17,12 +17,13 @@ const MovieList: FunctionComponent = () => {
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState<string>("popularity.desc");
-  const dispatch = useDispatch();
+  const [page, setPage] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
+  const dispatch = useDispatch();
   const searchQuery = useSelector((state: RootState) => state.search.query);
   const movies = useSelector((state: RootState) => state.movie.movies);
-  console.log({ movies });
-  const [loading, setLoading] = useState<boolean>(true);
 
   // Fetch Genres
   const fetchGenres = async () => {
@@ -34,7 +35,6 @@ const MovieList: FunctionComponent = () => {
     }
   };
 
-  // Fetch Movies with Filters
   const fetchMovies = async () => {
     setLoading(true);
     try {
@@ -43,14 +43,27 @@ const MovieList: FunctionComponent = () => {
         sort_by: sortBy,
         with_genres: selectedGenres.join(","),
         query: searchQuery,
+        page: page,
       };
 
       const response = searchQuery
-        ? await tmdbApi.get("/search/movie", { params: { query: searchQuery } })
+        ? await tmdbApi.get("/search/movie", {
+            params: { query: searchQuery, page },
+          })
         : await tmdbApi.get("/discover/movie", { params });
 
-      // Dispatch to Redux instead of using setMovies in local state
-      dispatch(setMovies(response.data.results));
+      if (response.data.results.length === 0) {
+        setHasMore(false); // Tidak ada data tambahan
+      } else {
+        // Gabungkan movies lama dan baru, lalu hapus duplikat
+        const combinedMovies = [...movies, ...response.data.results];
+        const uniqueMovies = combinedMovies.filter(
+          (movie, index, self) =>
+            index === self.findIndex((m) => m.id === movie.id) // Filter ID unik
+        );
+
+        dispatch(setMovies(uniqueMovies)); // Simpan data unik ke Redux
+      }
     } catch (error) {
       console.error("Error fetching movies:", error);
     } finally {
@@ -58,6 +71,7 @@ const MovieList: FunctionComponent = () => {
     }
   };
 
+  // UseEffect for Genres and Movies Fetching
   useEffect(() => {
     fetchGenres();
   }, []);
@@ -65,7 +79,7 @@ const MovieList: FunctionComponent = () => {
   useEffect(() => {
     fetchMovies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedGenres, sortBy, searchQuery]);
+  }, [selectedGenres, sortBy, searchQuery, page]);
 
   // Handle Genre Checkbox Change
   const handleGenreChange = (id: number) => {
@@ -76,10 +90,16 @@ const MovieList: FunctionComponent = () => {
     );
   };
 
+  const loadMoreMovies = () => {
+    if (hasMore) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
   return (
     <div className="mt-16 p-4 bg-gray-900 text-white">
       {/* Title */}
-      <div className="flex items-center justify-between p-4 mb-4">
+      <div className="sticky top-0 z-10 bg-gray-900 p-4 mb-4 shadow-md">
         <h1 className="text-3xl font-bold border-b-4 border-red-500 inline-block">
           Movies
         </h1>
@@ -88,7 +108,7 @@ const MovieList: FunctionComponent = () => {
       {/* Main Content */}
       <div className="flex px-4">
         {/* Left Sidebar for Filters */}
-        <div className="w-1/4 pr-4">
+        <div className="w-1/4 pr-4 sticky top-16 h-screen overflow-auto">
           <h2 className="text-xl font-bold mb-2 text-left">Sort By</h2>
           <select
             value={sortBy}
@@ -118,7 +138,6 @@ const MovieList: FunctionComponent = () => {
             ))}
           </div>
         </div>
-
         {/* Right Side for Movie Grid */}
         <div className="w-3/4">
           {/* Movies Grid */}
@@ -136,6 +155,18 @@ const MovieList: FunctionComponent = () => {
                   title={movie.title}
                 />
               ))}
+            </div>
+          )}
+
+          {/* Load More Button */}
+          {hasMore && !loading && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={loadMoreMovies}
+                className="bg-red-500 text-white py-2 px-4 rounded-md"
+              >
+                Load More
+              </button>
             </div>
           )}
         </div>

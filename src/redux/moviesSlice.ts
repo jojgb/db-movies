@@ -9,7 +9,7 @@ interface Movie {
 }
 
 interface MoviesState {
-  movies: Movie[]; // Pastikan ini adalah array dari objek Movie
+  movies: Movie[];
   loading: boolean;
 }
 
