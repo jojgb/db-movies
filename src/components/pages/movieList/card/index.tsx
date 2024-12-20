@@ -21,7 +21,7 @@ const Card: FunctionComponent<CardProps> = ({
   const navigate = useNavigate();
 
   const handleNavigate = () => {
-    navigate(`/movie/${id}`); // Navigasi ke halaman detail dengan ID
+    navigate(`/movie/${id}`);
   };
   return (
     <div
