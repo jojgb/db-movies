@@ -14,13 +14,13 @@ const Navbar: FunctionComponent<NavbarProps> = ({ className, fontColor }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (search.trim()) {
-      dispatch(setSearchQuery(search));
-      navigate("/list");
-    }
-    dispatch(setSearchQuery(search));
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearch(query);
+
+    dispatch(setSearchQuery(query));
+
+    navigate("/list");
   };
 
   return (
@@ -28,22 +28,16 @@ const Navbar: FunctionComponent<NavbarProps> = ({ className, fontColor }) => {
       className={`p-4 fixed top-0 left-0 w-full z-50 shadow-md ${className}`}
     >
       <ul className="flex justify-between items-center w-full">
-        <NavItem
-          label="Moovie Time"
-          href="/"
-          className={fontColor} // Font color for this item
-        />
+        <NavItem label="Moovie Time" href="/" className={fontColor} />
 
         <div className="flex items-center relative w-1/3">
-          <form onSubmit={handleSearch} className="w-full">
-            <input
-              type="text"
-              placeholder="Find moovie"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-2 rounded-md bg-slate-800 text-white"
-            />
-          </form>
+          <input
+            type="text"
+            placeholder="Find moovie"
+            value={search}
+            onChange={handleSearchChange}
+            className="w-full px-4 py-2 rounded-md bg-slate-800 text-white"
+          />
         </div>
 
         <div className="flex space-x-5">
