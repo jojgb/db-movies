@@ -4,6 +4,7 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import Home from "./components/pages/home";
 import MovieList from "./components/pages/movieList";
+import MovieDetail from "./components/pages/movieDetail";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             }
           />
           <Route path="/list" element={<MovieList />} />
+          <Route path="/movie/:id" element={<MovieDetail />} />
         </Routes>
         <Footer />
       </div>

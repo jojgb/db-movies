@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { FunctionComponent } from "react";
 import noPreviewImage from "../../../../assets/download.png";
+import { useNavigate } from "react-router-dom";
 
 interface CardProps {
   id: number;
@@ -17,6 +18,11 @@ const Card: FunctionComponent<CardProps> = ({
   poster_path,
   vote_average,
 }) => {
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(`/movie/${id}`); // Navigasi ke halaman detail dengan ID
+  };
   return (
     <div
       key={id}
@@ -58,7 +64,10 @@ const Card: FunctionComponent<CardProps> = ({
 
         {/* Bagian Bawah - Tombol View */}
         <div className="text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button className="bg-red-500 text-black px-4 py-2 rounded-full font-semibold transition-all duration-200 hover:bg-yellow-600">
+          <button
+            className="bg-red-500 text-black px-4 py-2 rounded-full font-semibold transition-all duration-200 hover:bg-yellow-600"
+            onClick={handleNavigate}
+          >
             View
           </button>
         </div>

@@ -57,7 +57,6 @@ const MovieList: FunctionComponent = () => {
       if (response.data.results.length === 0) {
         setHasMore(false);
       } else {
-        // Reset data jika ini halaman pertama, gabungkan jika Load More
         const newMovies =
           page === 1
             ? response.data.results
@@ -81,8 +80,8 @@ const MovieList: FunctionComponent = () => {
 
   // Reset movies & page saat filter berubah
   useEffect(() => {
-    dispatch(setMovies([])); // Reset Redux state movies
-    setPage(1); // Kembali ke halaman pertama
+    dispatch(setMovies([]));
+    setPage(1);
   }, [selectedGenres, sortBy, searchQuery, dispatch]);
 
   // Fetch genres on mount
