@@ -1,7 +1,7 @@
 # React + TypeScript + Vite
 
 1. projek ini dibuat menggunakan react typescript , vite , redux , react slick , react router dom
-2. cara run nya adalah npm run dev
+2. cara run nya adalah ketik npm i kemudian setelah terinstall jalankan npm run dev di terminal
 3. run di port 5173
 4. saya ingin membuatnya lebih lengkap lagi tetapi karena terkendala waktu dan banyak interview lain saya hanya mampu menyelesaikan nya seperti ini ,
 5. bila ada feed back mohon bisa kontak saya di jojgb96@gmail.com , agar saya bisa improve skill saya
