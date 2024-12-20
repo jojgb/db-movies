@@ -9,7 +9,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="flex flex-col min-h-screen">
-        <Navbar className="bg-black" fontColor="text-white" />
+        <Navbar className="bg-slate-700" fontColor="text-white" />
         <Routes>
           <Route
             path="/"
