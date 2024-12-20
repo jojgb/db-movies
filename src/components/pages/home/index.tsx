@@ -12,7 +12,7 @@ const Home: FunctionComponent<HomeProps> = () => {
       {/* Carousel   */}
       <CarouselSection />
 
-      {/* Discover Movies */}
+      {/* Discover  */}
       <DiscoverSection />
     </div>
   );

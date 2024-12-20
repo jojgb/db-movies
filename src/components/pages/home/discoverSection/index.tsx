@@ -1,6 +1,6 @@
 import { FunctionComponent, useState, useEffect } from "react";
 import { tmdbApi } from "../../../../api/apiConfig";
-import dayjs from "dayjs";
+import Card from "./card";
 
 interface DiscoverSectionProps {
   className?: string;
@@ -15,10 +15,14 @@ interface Movie {
   vote_average: number;
 }
 
-// Fungsi untuk mengambil data film berdasarkan tab aktif
 const fetchMoviesByType = async (type: string) => {
   try {
-    const response = await tmdbApi.get(`/movie/${type}`); // Endpoint dinamis
+    const params =
+      type === "popular"
+        ? { sort_by: "vote_average.desc" } // Sort by popularity (vote count descending)
+        : { sort_by: "primary_release_date.desc" }; // Sort by release date (most recent)
+
+    const response = await tmdbApi.get("/discover/movie", { params });
     return response.data.results.slice(0, 10); // Ambil 10 film pertama
   } catch (error) {
     console.error(`Error fetching ${type} movies:`, error);
@@ -27,15 +31,14 @@ const fetchMoviesByType = async (type: string) => {
 };
 
 const DiscoverSection: FunctionComponent<DiscoverSectionProps> = () => {
-  const [activeTab, setActiveTab] = useState<string>("popular"); // State aktif: "popular" atau "release_date"
-  const [movies, setMovies] = useState<Movie[]>([]); // State daftar film
-  const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [activeTab, setActiveTab] = useState<string>("popular");
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Fetch data sesuai tab aktif
   const loadMovies = async () => {
     setLoading(true);
-    const type = activeTab === "popular" ? "popular" : "upcoming"; // "popular" atau "upcoming"
-    const data = await fetchMoviesByType(type);
+    const data = await fetchMoviesByType(activeTab);
     console.log({ data });
     setMovies(data);
     setLoading(false);
@@ -87,31 +90,14 @@ const DiscoverSection: FunctionComponent<DiscoverSectionProps> = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
           {movies.map((movie) => (
-            <div
+            <Card
+              id={movie.id}
+              poster_path={movie.poster_path}
+              vote_average={movie.vote_average}
+              title={movie.title}
+              release_date={movie.release_date}
               key={movie.id}
-              className="relative bg-gray-800 text-white p-2 rounded"
-            >
-              {/* Average Vote with Star */}
-              <div className="absolute top-2 right-2 bg-black/70 px-2 py-1 rounded flex items-center gap-1">
-                <span className="text-yellow-400">★</span>
-                <span className="text-white text-sm font-semibold">
-                  {movie.vote_average.toFixed(1)}
-                </span>
-              </div>
-
-              {/* Movie Image */}
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                className="w-full h-60 object-cover rounded mb-2"
-              />
-
-              {/* Movie Title */}
-              <p className="font-semibold">{movie.title}</p>
-              <p className="text-sm opacity-75">
-                {dayjs(movie.release_date).year()}
-              </p>
-            </div>
+            />
           ))}
         </div>
       )}

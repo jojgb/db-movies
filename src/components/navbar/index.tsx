@@ -44,7 +44,7 @@ const Navbar: FunctionComponent<NavbarProps> = ({ className, fontColor }) => {
 
         <div className="flex space-x-5">
           <NavItem label="CATEGORIES" href="/" className={fontColor} />
-          <NavItem label="MOOVIES" href="/" className={fontColor} />
+          <NavItem label="MOOVIES" href="/list" className={fontColor} />
           <NavItem label="TV SHOWS" href="/" className={fontColor} />
           <NavItem label="LOGIN" href="/" className={fontColor} />
         </div>
