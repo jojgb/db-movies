@@ -19,8 +19,7 @@ const MovieList: FunctionComponent = () => {
   const [sortBy, setSortBy] = useState<string>("popularity.desc");
   const dispatch = useDispatch();
 
-  const searchQuery = useSelector((state: RootState) => state.search.query); // Ambil search query dari Redux
-  console.log({ searchQuery });
+  const searchQuery = useSelector((state: RootState) => state.search.query);
   const movies = useSelector((state: RootState) => state.movie.movies);
   console.log({ movies });
   const [loading, setLoading] = useState<boolean>(true);

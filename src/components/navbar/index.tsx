@@ -81,10 +81,10 @@ const Navbar: FunctionComponent<NavbarProps> = ({ className, fontColor }) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSuggestionClick = (movie: any) => {
-    setSearch(movie.title); // Set the input field to the selected movie's title
-    setFilteredMovies([]); // Clear the suggestions
-    setShowDropdown(false); // Hide dropdown
-    navigate(`/movie/${movie.id}`); // Navigate to the movie details page
+    setSearch(movie.title);
+    setFilteredMovies([]);
+    setShowDropdown(false);
+    navigate(`/movie/${movie.id}`);
   };
 
   return (
