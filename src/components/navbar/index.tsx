@@ -20,6 +20,7 @@ const Navbar: FunctionComponent<NavbarProps> = ({ className, fontColor }) => {
       dispatch(setSearchQuery(search));
       navigate("/list");
     }
+    dispatch(setSearchQuery(search));
   };
 
   return (

@@ -1,6 +1,9 @@
 import { FunctionComponent, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { tmdbApi } from "../../../api/apiConfig";
 import Card from "./card";
+import { setMovies } from "../../../redux/moviesSlice"; // Import setMovies dari moviesSlice
+import { RootState } from "../../../redux/store"; // RootState untuk selector
 
 interface Movie {
   id: number;
@@ -11,11 +14,15 @@ interface Movie {
 }
 
 const MovieList: FunctionComponent = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState<string>("popularity.desc");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const dispatch = useDispatch();
+
+  const searchQuery = useSelector((state: RootState) => state.search.query); // Ambil search query dari Redux
+  console.log({ searchQuery });
+  const movies = useSelector((state: RootState) => state.movie.movies);
+  console.log({ movies });
   const [loading, setLoading] = useState<boolean>(true);
 
   // Fetch Genres
@@ -43,7 +50,8 @@ const MovieList: FunctionComponent = () => {
         ? await tmdbApi.get("/search/movie", { params: { query: searchQuery } })
         : await tmdbApi.get("/discover/movie", { params });
 
-      setMovies(response.data.results);
+      // Dispatch to Redux instead of using setMovies in local state
+      dispatch(setMovies(response.data.results));
     } catch (error) {
       console.error("Error fetching movies:", error);
     } finally {
@@ -76,7 +84,6 @@ const MovieList: FunctionComponent = () => {
         <h1 className="text-3xl font-bold border-b-4 border-red-500 inline-block">
           Movies
         </h1>
-        <div className="flex gap-4" />
       </div>
 
       {/* Main Content */}
@@ -115,23 +122,12 @@ const MovieList: FunctionComponent = () => {
 
         {/* Right Side for Movie Grid */}
         <div className="w-3/4">
-          {/* Search Input */}
-          <div className="flex justify-end mb-4">
-            <input
-              type="text"
-              placeholder="Search by title..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-gray-800 p-2 rounded-md w-full md:w-1/2"
-            />
-          </div>
-
           {/* Movies Grid */}
           {loading ? (
             <p className="text-center">Loading movies...</p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {movies.map((movie) => (
+              {movies?.map((movie: Movie) => (
                 <Card
                   id={movie.id}
                   key={movie.id}
